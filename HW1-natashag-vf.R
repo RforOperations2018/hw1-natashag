@@ -7,7 +7,7 @@ library(plotly)
 library(shinythemes)
 library(DT)
 
-cancer<-esoph
+cancer <- esoph
 
 ui <- fluidPage(
   navbarPage("Smoking, Alcohol and Esophageal Cancer NavBar", 
@@ -44,10 +44,12 @@ ui <- fluidPage(
 # I will define the server 
 server <- function(input, output) {
   output$plot <- renderPlotly({
-    ggplot(data = cancer, aes(x = alcgp, y= ncases, fill = tobgp)) + geom_bar(stat="identity")+ 
-      facet_grid(.~agegp) +
-      labs(x="Alcohol level", y="Number of Cases of Cancer", title= "Smoking, Alcohol and Esophageal Cancer by Age",  fill= "Smoking Level")+ 
-      theme(text= element_text(size=7.5),axis.text.x=element_text(angle=45,vjust=1,hjust=1), axis.title.x=element_text(line=2.2))
+    ggplotly(
+      ggplot(data = cancer, aes(x = alcgp, y= ncases, fill = tobgp)) + geom_bar(stat="identity")+ 
+        facet_grid(.~agegp) +
+        labs(x = "", y="Number of Cases of Cancer", title= "Smoking, Alcohol and Esophageal Cancer by Age",  fill= "Smoking Level")+ 
+        theme(text= element_text(size=7.5), axis.text.x=element_text(angle=45,vjust=1,hjust=1), axis.title.x=element_text(line=2.2, margin = margin(t = 20, r = 0, b = 0, l = 0))) # The margin call here works just in ggplot2
+    ) %>% layout(xaxis=list(title = "<br><br>Alcohol level")) # Closest I could get.
   }) 
   output$table <- DT::renderDataTable({
     subset(cancer, agegp %in% input$agegp_select, select = c(agegp, alcgp, tobgp, ncases, ncontrols))
@@ -56,4 +58,3 @@ server <- function(input, output) {
 
 #  I will run the application 
 shinyApp(ui = ui, server = server)
-    
